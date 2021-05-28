@@ -8,118 +8,149 @@ import numpy as np
 import scipy.stats as st
 from statsmodels.sandbox.stats.runs import runstest_1samp
 
+class RandomNumberGenerator:
 
-def LCG_g(a=7, m=11, x0=1) -> list:
-    x = x0
-    random_numbers = []
+    def __init__(self, a=16807, n=2147483647, seed=555):
+        self.out = seed
+        self.a = a
+        self.n = n
 
-    while True:
-        x = (a * x) % m
-        random_numbers.append(x)
-
-        if x == x0:
-            break
-
-
-    iterator = iter(random_numbers)
-
-    return iterator
+    def __next__(self):
+        self.out = self.a * self.out % self.n
+        return self.out
 
 
-def uniform_generator_j(a=7, m=11, x0=1, i=1000) -> list:
-    x = x0
-    random_numbers = []
+class UniformNumberGenerator(RandomNumberGenerator):
 
-    while i > 0:
-        x = (a * x) % m
-        random_numbers.append(x/m)
+    def __next__(self, a=0, b=1):
 
-        if x == x0:
-            break
+        if a == 0 and b == 1:
+            return super(UniformNumberGenerator, self).__next__()/self.n
 
-        i -= 1
+        lxy = b-a+1
 
-    iterator = iter(random_numbers)
-
-    return iterator
+        return ((super(UniformNumberGenerator, self).__next__()/self.n)*lxy + a)
 
 
-def Bernoulli_b(p, V):
-    U = next(V)
-    if U < p:
-        return 1
+class Bernoulli:
 
-    return 0
+    def __init__(self):
+        self.u = UniformNumberGenerator()
+
+    def __next__(self, p):
+        if self.u.__next__() <= p:
+            return 1
+        else:
+            return 0
+
+class Binomial:
+
+    def __init__(self):
+        self.u = UniformNumberGenerator()
+
+    def run(self, p, N):
+        x = 0
+        for i in range(N):
+            if self.u.__next__() <= p:
+                x += 1
+
+        return x
 
 
-def binomial_d(N, p):
-    x = 0
-    U = uniform_generator_j()
+class Poisson:
 
-    for i in range(N):
-        w = next(U)
-        if w <= p:
+    def __init__(self):
+        self.u = UniformNumberGenerator()
+
+    def run(self, lamb):
+        x = 0
+        w = self.u.__next__()
+
+        while w >= math.exp(-lamb):
+            w *= self.u.__next__()
             x += 1
 
-    return x
+        return x-1
 
 
-def Poisson_p(lamb, U1):
-    # a First Course in Probability, page 449
+class Exponential:
 
-    x = 0
-    U = next(U1)
-
-    while U >= math.exp(-lamb):
-        U *= next(U1)
-        x += 1
-
-    return x-1
+    def __init__(self):
+        self.u = UniformNumberGenerator()
 
 
-def exponential_w(t1, t2):  # wykładniczy
-    flag = True
+    def run(self):
 
-    while flag:
-        flag = False
-        U = v1(0, 1, t1)
-        V = v1(0, 2 / math.e, t2)
-        x = V/U
-
-        if x <= 2 - 2*U:
-            flag = True
-        elif x <= 2/U - 2:
-            if x <= -2 * math.log(U, math.e):
-                flag = True
-
-    return x
+        u1 = self.u.__next__()
+        return -math.log(u1, math.e)
 
 
-def v1(a1, b1, xr1) -> list:  # generator o rozkladzie jednostajnym od a1 do b1
-    lxy = b1-a1+1
-    xr = next(xr1)
-    wxy = (xr*lxy)+a1
+class Normal:
+    def __init__(self):
+        self.u = UniformNumberGenerator()
+        self.v = UniformNumberGenerator()
+        self.w = UniformNumberGenerator()
 
-    return wxy
+    def run(self):
 
-def normal_n():
-    global x
-    flag = True
-    U = uniform_generator_j()
+        w1 = self.u.__next__()
+        p1 = 16/((2*math.pi*math.e)**0.5)
+        p2 = 0.1108179673
+        p4 = 0.0026997960
+        p3 = 1-p1-p2-p4
+        c1 = 17.4973119
+        c2 = 4.73570326
+        c3 = 2.15787544
+        c4 = 2.36785163
+        M = 0.357070192
 
-    while flag:
-        flag = False
-        gU = next(U)
-        V = v1(-((2/math.e) ** 0.5), ((2 / math.e) ** 0.5))
-        x = V/gU
+        if 0 <= w1 and w1 <= p1:
+            return (2*w1)/p1 - 1 + self.v.__next__() + self.w.__next__()
 
-        if x**2 <= 2*(3-gU*(4+gU)):
-            flag = True
-        elif x**2 <= 2/gU - 2*gU:
-            if x**2 <= -4 * math.log(gU, math.e):
-                flag = True
+        if p1 < w1 and w1 <= (p1+p2):
+            return 1.5*((w1-p1)/p2 -1 + self.v.__next__())
 
-    return x
+        if (1-p4) < w1 and w1 <= 1:
+            while True:
+                s1 = self.v.__next__()
+                s2 = self.w.__next__()
+                x = 4.5-math.log(s2,math.e)
+                if(x*s1*s1 > 4.5):
+                    break
+
+            return (2*x)**(0.5) * numpy.sign(w1-(1-p4/2))
+
+        if p1+p2 < w1 and w1 <= (1-p4):
+            while True:
+                w1 = self.u.__next__(-3, 3)
+                w2 = self.v.__next__()
+                v = abs(w1)
+
+                W = (c4/M)*(3-v)*(3-v)
+                S = 0
+
+                if v < 1.5:
+                    S = (c3/M) * (1.5 - v)
+                if v < 1:
+                    S = S + (c2/M)*(3-v*v)-W
+
+                if w2 > (c1/M) * math.exp(-v*v)/2 - S - W:
+                    break
+
+            return w1
+
+        return 0
+
+    def r2(self):  # rozklad normalny N(0, 1)
+        while True:
+            w1 = self.u.__next__()
+            w2 = self.v.__next__(-((2/math.e)**(0.5)),(2/math.e)**(0.5))
+            t = w2/w1
+
+            if w1*w1 > math.exp(-t*t/2):
+                break
+        return t
+
 
 
 # https://www.codespeedy.com/runs-test-of-randomness-in-python-programming/
@@ -147,16 +178,35 @@ def runs_test(l, l_median): # testy serii
     return z
 
 
-xv0 = uniform_generator_j(16807, 2147483647, 133)
-V = v1(0, 50, xv0)
+g = RandomNumberGenerator()
+u = UniformNumberGenerator()
+b1 = Bernoulli()
+b2 = Binomial()
+p = Poisson()
+ex = Exponential()
+nor = Normal()
+a = []
+b = []
+c = []
+d = []
+e = []
+f = []
+n = []
 
-print(V)
+for i in range(1000):
+    a.append(g.__next__())
+    e.append(ex.run())
+    n.append(nor.r2())
 
-l = []
-xv1 = uniform_generator_j(16807, 2147483647, 133)
-for i in range(100):
-    t = v1(0, 100, xv1)
-    l.append(t)
 
-print(l)
-print(f'Z = {abs(runs_test(l, np.median(l)))}') # >= 0.5 czyli ok
+print(c)
+print(a)
+print(b)
+print(d)
+print(e)
+print(f)
+print(n)
+
+plt.figure(figsize=(10,10))
+plt.hist(n, range=[1, 2])
+plt.show()
