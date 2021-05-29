@@ -7,13 +7,14 @@ import numpy
 
 class RandomNumberGenerator:
 
-    def __init__(self, a=16807, n=2147483647, seed=555):
+    def __init__(self, a=16807, n=2147483647, c=0, seed=30):
         self.out = seed
         self.a = a
         self.n = n
+        self.c = c
 
     def __next__(self):
-        self.out = self.a * self.out % self.n
+        self.out = (self.a * self.out + self.c) % self.n
         return self.out
 
 
@@ -57,17 +58,18 @@ class Binomial:
 class Poisson:
 
     def __init__(self):
-        self.u = UniformNumberGenerator()
+        self.e = Exponential()
 
     def run(self, lamb):
-        x = 0
-        w = self.u.__next__()
+        x = -1
+        s = 0
 
-        while w >= math.exp(-lamb):
-            w *= self.u.__next__()
+        while s <= lamb:
+            y = self.e.run()
+            s += y
             x += 1
 
-        return x - 1
+        return x
 
 
 class Exponential:
@@ -86,6 +88,7 @@ class Normal:
         self.u = UniformNumberGenerator()
         self.v = UniformNumberGenerator()
         self.w = UniformNumberGenerator()
+        self.e = Exponential()
 
     def run(self):
 
@@ -148,6 +151,16 @@ class Normal:
         return t
 
 
+    def r3(self):
+        while True:
+            w1 = self.e.run()
+            w2 = self.u.__next__()
+
+            if ((2*math.e/math.pi)**0.5)*w2*math.exp(-w1) <= ((2/math.pi)**0.5) * math.exp(-w1*w1/2):
+                break
+        return w1
+
+
 class Tests:
 
     # https://www.codespeedy.com/runs-test-of-randomness-in-python-programming/
@@ -155,7 +168,7 @@ class Tests:
         runs, n1, n2 = 0, 0, 0
 
         for i in range(len(l)):
-            # no. of runs
+
             if (l[i] >= l_median and l[i - 1] < l_median) or (l[i] < l_median and l[i - 1] >= l_median):
                 runs += 1
 
@@ -255,5 +268,6 @@ class Histogram:
         plt.show()
 
 
-h = Histogram(10000)
-h.draw_normal()
+if __name__ == "__main__":
+    h = Histogram(10000)
+    h.draw_normal()
