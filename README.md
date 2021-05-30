@@ -7,8 +7,7 @@
 * [Wstęp - wymagania projektowe](#wstęp)
 * [Opis teoretyczny problemu, rozwiązanie matematyczne](#opis-teoretyczny-problemu)
 * [Implementacja rozwiązania (pseudokod)](#implementacja-rozwiązania)
-* [Rezultaty działania programu](#rezultaty-działania-programu)
-* [Eksperymenty](#eksperymenty)
+* [Rezultaty działania programu i eksperymenty](#rezultaty-działania-programu)
 * [Interpretacja wyników](#interpretacja-wyników)
 * [Posłowie](#posłowie)
 
@@ -222,7 +221,7 @@ Poniżej znajdują się algorytmy zapisane w pseudokodzie pythonopodobnym, na kt
     return u
 ```
 
-## Rezultaty działania programu <a name="rezultaty-działania-programu"></a>
+## Rezultaty działania programu i eksperymenty <a name="rezultaty-działania-programu"></a>
 Założenia: wygenerowano po 10000 danych z każdego generatora. Rezultat został przedstawiony na graficznych histogramach - mogą one stanowić pierwszy (mało matematyczny) test poprawności działania generatorów, ponieważ przedstawiają rozłożenie danych. 
 
 Jako że działanie generatorów opiera się na głównym generatorze G, to ważną rolę pełnią parametry początkowe. Do budowania histogramu przyjęto wartości używane np. w C++11 (minstd_rand): `a = 48271, m = 2147483647, c = 0, x0 = 1`.
@@ -248,5 +247,12 @@ Jako że działanie generatorów opiera się na głównym generatorze G, to waż
 - ### N
 ![n](/Histograms/normal.png "N")
 
+
+## Posłowie <a name="posłowie"></a>
+Projekt został wykonany na potrzeby kursu "Rachunek prawdopodobieństwa i statystyka" na Uniwersytecie Jagiellońskim.
+### Źródła projektowe:
+* Wieczorkowski Robert, "Komputerowe generatory liczb losowych"
+* Ross Sheldon, "A first course in probability"
+* Wałaszek Jerzy, https://eduinf.waw.pl/
 
 
