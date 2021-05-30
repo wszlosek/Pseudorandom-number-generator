@@ -16,6 +16,8 @@ Istotą projektu było stworzenie generatora liczb pseudolosowych o rozkładzie 
 
 Zakazane było wykorzystywanie gotowych funkcji lub bibliotek dla generowania liczb losowych. Zakaz obejmował również korzystanie ze źródel pseudolosowych danych typu zegar systemowy.
 
+Gotowe generatory należało przetestować dowolnymi testami typu: chi-kwadrat, Kołmogorova itp.
+
 ## Opis teoretyczny problemu, rozwiązania matematyczne <a name="opis-teoretyczny-problemu"></a>
 Liczba losowa jest liczbą `r` należącą do pewnego zbioru wartości `{r_1, ..., r_n}` wybieranych z pewnym prawdopodobieństwem. Jeśli jako `r` może pojawić się każda z liczb zbioru z tym samym prawdopodobieństwem `P(r) = 1/n`, to mówimy o równomiernym rozkładzie prawdopodobieństwa liczb losowych z tego zbioru. "Naturalne" liczby losowe wytwarzają się na przykład przy rzucaniu kostką do gry, tasowaniu kart, ciągnieniu losów z urny itp. Generatory takie mają jednak niewielkie zastosowanie praktyczne i mogą być przydatne tylko do losowania niedużych próbek do badań reprezentacyjnych.
 
@@ -247,12 +249,16 @@ Jako że działanie generatorów opiera się na głównym generatorze G, to waż
 - ### N
 ![n](/Histograms/normal.png "N")
 
+### Testowanie
+Jednym z czynników składających się na całość projektu było testowanie generatorów. 
 
+Założenie wstępne (w ogólności najważniejsze) dotyczące generatorów innych niż G oraz U: wystarczy przetestować jedynie generator U, ponieważ pozostałe rozkłady biorą się (algorytmicznie) właśnie z niego, zatem przetestowany i potwierdzony poprawnościowo generator U będzie świadczył o poprawności generatorów rozkładowych (Poissona, Normalnego i innych).
+
+Do przetestowania generatora G zostanie użyty test serii, z kolei do generatora U - test chi-kwadrat.
 ## Posłowie <a name="posłowie"></a>
 Projekt został wykonany na potrzeby kursu "Rachunek prawdopodobieństwa i statystyka" na Uniwersytecie Jagiellońskim.
+
 ### Źródła projektowe:
 * Wieczorkowski Robert, "Komputerowe generatory liczb losowych"
 * Ross Sheldon, "A first course in probability"
 * Wałaszek Jerzy, https://eduinf.waw.pl/
-
-
