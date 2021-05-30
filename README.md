@@ -226,3 +226,27 @@ Poniżej znajdują się algorytmy zapisane w pseudokodzie pythonopodobnym, na kt
 Założenia: wygenerowano po 10000 danych z każdego generatora. Rezultat został przedstawiony na graficznych histogramach - mogą one stanowić pierwszy (mało matematyczny) test poprawności działania generatorów, ponieważ przedstawiają rozłożenie danych. 
 
 Jako że działanie generatorów opiera się na głównym generatorze G, to ważną rolę pełnią parametry początkowe. Do budowania histogramu przyjęto wartości używane np. w C++11 (minstd_rand): `a = 48271, m = 2147483647, c = 0, x0 = 1`.
+
+- ### G(48271, 2147483647, 0, 1)
+![lcg](/Histograms/lcg.png "LCG")
+
+- ### U(0, 1)
+![u](/Histograms/u(0,1).png "U(0, 1)")
+
+- ### B(0.6)
+![b](/Histograms/bernoulli.png "B(0.6)")
+
+- ### Bi(0.7, 100)
+![bi](/Histograms/binomial.png "Bi(0.7, 100)")
+
+- ### P(3)
+![p](/Histograms/poisson.png "P(3)")
+
+- ### E
+![e](/Histograms/expo.png "E(0, 1)")
+
+- ### N
+![n](/Histograms/normal.png "N")
+
+
+
