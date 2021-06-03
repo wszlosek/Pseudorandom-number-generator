@@ -1,13 +1,17 @@
 # Wojciech Szlosek
 
 import math
+from typing import Callable
+
 import matplotlib.pyplot as plt
 import numpy
-
+import scipy
+from scipy.stats import norm, poisson
+import itertools
 
 class RandomNumberGenerator:
 
-    def __init__(self, a=16807, n=2147483647, c=0, seed=30):
+    def __init__(self, a=48271, n=2147483647, c=0, seed=1):
         self.out = seed
         self.a = a
         self.n = n
@@ -104,15 +108,15 @@ class Normal:
         M = 0.357070192
 
         if 0 <= w1 and w1 <= p1:
-            return (2 * w1) / p1 - 1 + self.v.__next__() + self.w.__next__()
+            return (2 * w1) / p1 - 1 + self.u.__next__() + self.u.__next__()
 
         if p1 < w1 and w1 <= (p1 + p2):
-            return 1.5 * ((w1 - p1) / p2 - 1 + self.v.__next__())
+            return 1.5 * ((w1 - p1) / p2 - 1 + self.u.__next__())
 
         if (1 - p4) < w1 and w1 <= 1:
             while True:
-                s1 = self.v.__next__()
-                s2 = self.w.__next__()
+                s1 = self.u.__next__()
+                s2 = self.u.__next__()
                 x = 4.5 - math.log(s2, math.e)
                 if (x * s1 * s1 > 4.5):
                     break
@@ -122,7 +126,7 @@ class Normal:
         if p1 + p2 < w1 and w1 <= (1 - p4):
             while True:
                 w1 = self.u.__next__(-3, 3)
-                w2 = self.v.__next__()
+                w2 = self.u.__next__()
                 v = abs(w1)
 
                 W = (c4 / M) * (3 - v) * (3 - v)
@@ -140,40 +144,67 @@ class Normal:
 
         return 0
 
-    def r2(self):  # rozklad normalny N(0, 1)
+    def r2(self):  # rozklad normalny N(0, 1), źle
         while True:
             w1 = self.u.__next__()
-            w2 = self.v.__next__(-((2 / math.e) ** 0.5), (2 / math.e) ** 0.5)
+            w2 = self.u.__next__(-((2 / math.e) ** 0.5), (2 / math.e) ** 0.5)
             t = w2 / w1
 
             if w1 * w1 > math.exp(-t * t / 2):
                 break
         return t
 
-
     def r3(self):
         while True:
             w1 = self.e.run()
             w2 = self.u.__next__()
 
-            if ((2*math.e/math.pi)**0.5)*w2*math.exp(-w1) <= ((2/math.pi)**0.5) * math.exp(-w1*w1/2):
+            if ((2 * math.e / math.pi) ** 0.5) * w2 * math.exp(-w1) <= ((2 / math.pi) ** 0.5) * math.exp(-w1 * w1 / 2):
                 break
         return w1
+
+    def r4(self): # Box - Muller
+        w1 = self.u.__next__()
+        w2 = self.u.__next__()
+        a = 2 * math.pi * w2
+        p = (-2 * math.log(w1, math.e)) ** 0.5
+
+        return (p * math.cos(a))
+
+
+    def r5(self): # polar method
+        while True:
+            w1 = self.u.__next__()
+            w2 = self.u.__next__()
+            v1 = 2*w1 - 1
+            v2 = 2*w2 - 1
+            w = v1*v1 + v2*v2
+
+            if w >= 1:
+                break
+
+        return (v1 * (-2*math.log(w, math.e)/w))
 
 
 class Tests:
 
+    def __init__(self, median):
+        self.median = median
+
     # https://www.codespeedy.com/runs-test-of-randomness-in-python-programming/
-    def runs_test(l, l_median):  # testy serii
+    def runs_test(self, l):
+
         runs, n1, n2 = 0, 0, 0
 
         for i in range(len(l)):
 
-            if (l[i] >= l_median and l[i - 1] < l_median) or (l[i] < l_median and l[i - 1] >= l_median):
+            # no. of runs
+            if (l[i] >= self.median and l[i - 1] < self.median) or (l[i] < self.median and l[i - 1] >= self.median):
                 runs += 1
 
-            if (l[i]) >= l_median:
+            if (l[i]) >= self.median:
                 n1 += 1
+
             else:
                 n2 += 1
 
@@ -185,6 +216,43 @@ class Tests:
 
         return z
 
+
+    def chi_square(self, data, cdf1: Callable, bin=200):
+        bin = int(2*len(data)**(0.4))
+        d = bin
+        sort = sorted(data)
+        minimum = min(sort)
+        maximum = max(sort)
+        n = len(data)
+
+        walker = (maximum-minimum)/bin
+        bins_ranges = [(minimum + i * walker, minimum + (i+1)*walker) for i in range(bin)]
+        bins = [[] for _ in range(bin)]
+
+        i = 0
+        for s in sort:
+            while i < bin-1 and s > bins_ranges[i][1]:
+                i += 1
+            bins[i].append(s)
+
+        chi2 = 0
+
+        for b, lu in zip(bins, bins_ranges):
+            ex = n * ((cdf1[int(lu[1])]) - (cdf1[int(lu[0])]))
+            if ex == 0:
+                d -= 1
+                continue
+
+            obs = len(bins)
+            chi2 += ((obs-ex)**2)/ex
+
+        if chi2 > scipy.stats.chi2.ppf(0.95, d):
+            passed = False
+
+        else:
+            passed = True
+
+        return chi2, passed
 
 class Histogram:
     def __init__(self, n=10):
@@ -204,11 +272,13 @@ class Histogram:
     def draw_UN(self):
         u = UniformNumberGenerator()
         l = []
+        a = 0
+        b = 1
 
         for i in range(self.n):
-            l.append(u.__next__())
+            l.append(u.__next__(a, b))
 
-        plt.title("Uniform numbers")
+        plt.title(f"Uniform numbers [U({a},{b})]")
         plt.hist(l)
         plt.show()
 
@@ -230,7 +300,7 @@ class Histogram:
         for i in range(self.n):
             l.append(b.run(p, N))
 
-        plt.title("Binomial")
+        plt.title(f"Binomial [B({p}, {N})]")
         plt.hist(l)
         plt.show()
 
@@ -241,7 +311,7 @@ class Histogram:
         for i in range(self.n):
             l.append(p.run(lamb))
 
-        plt.title("Poisson")
+        plt.title(f"Poisson [P({lamb})]")
         plt.hist(l)
         plt.show()
 
@@ -257,17 +327,18 @@ class Histogram:
         plt.show()
 
     def draw_normal(self):
-        n = Normal()
+        nor = Normal()
         l = []
 
         for i in range(self.n):
-            l.append(n.r2())
+            l.append(nor.r4())
 
         plt.title("Normal")
-        plt.hist(l, range=[1, 2])
+        plt.hist(l)
         plt.show()
 
 
 if __name__ == "__main__":
+
     h = Histogram(10000)
     h.draw_normal()
