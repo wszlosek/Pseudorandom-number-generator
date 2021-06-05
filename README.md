@@ -258,12 +258,14 @@ Posłużyłem się testami chi-kwadrat. Test chi-kwadrat służy do sprawdzenia,
 > <a href="https://www.codecogs.com/eqnedit.php?latex=\chi^2&space;=&space;\sum_{i=1}^k&space;\frac{(O_i&space;-&space;E_i)^2}{E_i}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\chi^2&space;=&space;\sum_{i=1}^k&space;\frac{(O_i&space;-&space;E_i)^2}{E_i}" title="\chi^2 = \sum_{i=1}^k \frac{(O_i - E_i)^2}{E_i}" /></a>
 gdzie `O_i` oznacza obserowaną częstotliwość dla i, z kolei `E_i` oczekiwaną częstotliwość obliczną ze wzoru:
 > <a href="https://www.codecogs.com/eqnedit.php?latex=E_i&space;=&space;N(F(Y_b)&space;-&space;F(Y_a))" target="_blank"><img src="https://latex.codecogs.com/gif.latex?E_i&space;=&space;N(F(Y_b)&space;-&space;F(Y_a))" title="E_i = N(F(Y_b) - F(Y_a))" /></a>
+
 gdzie `F` to dystrybuanta testowanej dystrybucji, Y_b jest górną granicą klasy, Y_a dolną granicą, a N jest wielkością tablicy z danymi (ilością danych). 
 
 Ilość "pojemników" nie jest z góry określona, wiele źródeł podaje optymalną ich ilość jako `2(N^(0.4))` - taka wartość domyślna jest używana podczas testowania projektowego.
 
 Odrzucamy hipotezę, że dane pochodzą z populacji o danym rozkładzie, jeśli:
 > <a href="https://www.codecogs.com/eqnedit.php?latex=\chi^2&space;>&space;\chi^2_{1-a,&space;k-c}&space;=&space;P" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\chi^2&space;>&space;\chi^2_{1-a,&space;k-c}&space;=&space;P" title="\chi^2 > \chi^2_{1-a, k-c} = P" /></a>
+
 gdzie `P` oznacza wartość krytyczną chi-kwadrat dla k-c stopni swobody i pewnym poziomem istotności `a` (w niniejszym programie przyjęto, że `a = 0.05`).
 
 #### Sposób testowania w Pythonie:
@@ -324,5 +326,5 @@ Projekt został wykonany na potrzeby kursu "Rachunek prawdopodobieństwa i staty
 ### Źródła projektowe:
 * Wieczorkowski Robert, "Komputerowe generatory liczb losowych"
 * Ross Sheldon, "A first course in probability"
-* Wałaszek Jerzy, https://eduinf.waw.pl/
+* Wałaszek Jerzy, I Liceum Ogólnokształcące im. K. Brodzińskiego w Tarnowie: https://eduinf.waw.pl/
 * National Institute of Standards and Technology: https://www.itl.nist.gov/div898/handbook/eda/section3/eda35f.htm
