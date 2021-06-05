@@ -1,12 +1,9 @@
 # Wojciech Szlosek
 
 import math
-from typing import Callable
-
 import matplotlib.pyplot as plt
 import numpy
-import scipy
-from scipy.stats import norm, poisson
+import scipy.stats
 import itertools
 
 class RandomNumberGenerator:
@@ -188,7 +185,7 @@ class Normal:
 
 class Tests:
 
-    def __init__(self, median):
+    def __init__(self, median=0):
         self.median = median
 
     # https://www.codespeedy.com/runs-test-of-randomness-in-python-programming/
@@ -217,42 +214,35 @@ class Tests:
         return z
 
 
-    def chi_square(self, data, cdf1: Callable, bin=200):
-        bin = int(2*len(data)**(0.4))
-        d = bin
-        sort = sorted(data)
-        minimum = min(sort)
-        maximum = max(sort)
-        n = len(data)
-
-        walker = (maximum-minimum)/bin
-        bins_ranges = [(minimum + i * walker, minimum + (i+1)*walker) for i in range(bin)]
+    def chi_square(self, data, cdf):
+        bin = int(2 * (len(data) ** 0.4))
+        k = bin # degrees of freedom, stopnie swobody
+        a = min(data)
+        b = max(data)
+        sorted_data = sorted(data)
+        bins_ranges1 = [a + i * (b - a) / bin for i in range(bin)]
+        bins_ranges2 = [a + (i+1) * (b - a) / bin for i in range(bin)]
         bins = [[] for _ in range(bin)]
-
+        chi2 = 0
         i = 0
-        for s in sort:
-            while i < bin-1 and s > bins_ranges[i][1]:
+
+        for s in sorted_data:
+            while i < bin-1 and s > bins_ranges2[i]:
                 i += 1
             bins[i].append(s)
 
-        chi2 = 0
-
-        for b, lu in zip(bins, bins_ranges):
-            ex = n * ((cdf1[int(lu[1])]) - (cdf1[int(lu[0])]))
-            if ex == 0:
-                d -= 1
+        for i in range(bin):
+            expected = len(data) * (cdf(bins_ranges2[i]) - cdf(bins_ranges1[i]))
+            if expected == 0:
+                k -= 1
                 continue
+            observed = len(bins[i])
+            chi2 += ((observed-expected)**2)/expected
 
-            obs = len(bins)
-            chi2 += ((obs-ex)**2)/ex
+        if chi2 > scipy.stats.chi2.ppf(0.95, k):
+            return chi2, scipy.stats.chi2.ppf(0.95, k), False
 
-        if chi2 > scipy.stats.chi2.ppf(0.95, d):
-            passed = False
-
-        else:
-            passed = True
-
-        return chi2, passed
+        return chi2, scipy.stats.chi2.ppf(0.95, k), True
 
 class Histogram:
     def __init__(self, n=10):
@@ -340,5 +330,8 @@ class Histogram:
 
 if __name__ == "__main__":
 
-    h = Histogram(10000)
-    h.draw_normal()
+    t = Tests()
+    N = Normal()
+    data = [N.r4() for _ in range(10000)]
+    cdf = lambda u: scipy.stats.norm.cdf(x = u)
+    print(t.chi_square(data, cdf))
