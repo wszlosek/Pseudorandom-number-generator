@@ -254,11 +254,77 @@ Jednym z czynników składających się na całość projektu było testowanie g
 
 Założenie wstępne (w ogólności najważniejsze) dotyczące generatorów innych niż G oraz U: wystarczy przetestować jedynie generator U, ponieważ pozostałe rozkłady biorą się (algorytmicznie) właśnie z niego, zatem przetestowany i potwierdzony poprawnościowo generator U będzie świadczył o poprawności generatorów rozkładowych (Poissona, Normalnego i innych).
 
-Do przetestowania generatora G zostanie użyty test serii, z kolei do generatora U - test chi-kwadrat.
+Posłużyłem się testami chi-kwadrat. Test chi-kwadrat służy do sprawdzenia, czy próbka danych pochodzi z grona populacji o określonym rozkładzie. W przypadku obliczenia jakości dopasowania chi-kwadrat dane są podzielone na k przedziałów, a statystyka testowa jest zdefiniowana jako:
+> <a href="https://www.codecogs.com/eqnedit.php?latex=\chi^2&space;=&space;\sum_{i=1}^k&space;\frac{(O_i&space;-&space;E_i)^2}{E_i}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\chi^2&space;=&space;\sum_{i=1}^k&space;\frac{(O_i&space;-&space;E_i)^2}{E_i}" title="\chi^2 = \sum_{i=1}^k \frac{(O_i - E_i)^2}{E_i}" /></a>
+gdzie `O_i` oznacza obserowaną częstotliwość dla i, z kolei `E_i` oczekiwaną częstotliwość obliczną ze wzoru:
+> <a href="https://www.codecogs.com/eqnedit.php?latex=E_i&space;=&space;N(F(Y_b)&space;-&space;F(Y_a))" target="_blank"><img src="https://latex.codecogs.com/gif.latex?E_i&space;=&space;N(F(Y_b)&space;-&space;F(Y_a))" title="E_i = N(F(Y_b) - F(Y_a))" /></a>
+
+gdzie `F` to dystrybuanta testowanej dystrybucji, Y_b jest górną granicą klasy, Y_a dolną granicą, a N jest wielkością tablicy z danymi (ilością danych). 
+
+Ilość "pojemników" nie jest z góry określona, wiele źródeł podaje optymalną ich ilość jako `2(N^(0.4))` - taka wartość domyślna jest używana podczas testowania projektowego.
+
+Odrzucamy hipotezę, że dane pochodzą z populacji o danym rozkładzie, jeśli:
+> <a href="https://www.codecogs.com/eqnedit.php?latex=\chi^2&space;>&space;\chi^2_{1-a,&space;k-c}&space;=&space;P" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\chi^2&space;>&space;\chi^2_{1-a,&space;k-c}&space;=&space;P" title="\chi^2 > \chi^2_{1-a, k-c} = P" /></a>
+
+gdzie `P` oznacza wartość krytyczną chi-kwadrat dla k-c stopni swobody i pewnym poziomem istotności `a` (w niniejszym programie przyjęto, że `a = 0.05`).
+
+#### Sposób testowania w Pythonie:
+Tworzymy tablicę z przykładowymi danymi o danym rozkładzie, określamy funkcję `cdf` z modułu `scipy.stats` o danym rozkładzie (czyli `scipy.stats.XYZ.cdf(arg)`, przykładowo: `scipy.stats.bernoulli(k, p=0.6)`. 
+
+Do testowania użyto 10000 danych wejściowych, generator G z argumentami używanymi powyżej. 
+`True` - test zaliczony, `False` - test niezaliczony.
+
+#### Testowanie rozkładu Bernoulliego:
+```python
+    data = [B.__next__(0.6) for _ in range(10000)]
+    cdf = lambda x: scipy.stats.bernoulli.cdf(k=x, p=0.6)
+    print(t.chi_square(data, cdf))
+    
+    # True
+```
+#### Testowanie rozkładu dwumianowego:
+```python
+    data = [Bi.run(0.7, 100) for _ in range(10000)]
+    cdf = lambda x: scipy.stats.binom.cdf(k=x, p=0.7, n=100)
+    print(t.chi_square(data, cdf))
+    
+    # True
+```
+#### Testowanie rozkładu Poissona:
+```python
+    data = [P.run(3) for _ in range(10000)]
+    cdf = lambda x: scipy.stats.poisson.cdf(k=x, mu=3)
+    print(t.chi_square(data, cdf))
+    
+    # True
+```
+
+#### Testowanie rozkładu wykładniczego:
+```python
+    data = [E.run() for _ in range(100000)]
+    cdf = lambda u: scipy.stats.expon.cdf(x=u)
+    print(t.chi_square(data, cdf))
+    
+    # False (np. dla x0 = 1)
+    # True (np. dla x0 = 3)
+```
+#### Testowanie rozkładu normalnego:
+```python
+    data = [N.r4() for _ in range(10000)]
+    cdf = lambda u: scipy.stats.norm.cdf(x=u)
+    print(t.chi_square(data, cdf))
+    
+    # True
+```
+
+## Interpretacja wyników <a name="interpretacja-wyników"></a>
+Generalnie można uznać testowanie projektowych generatorów jako pozytywną weryfikację ich wyników. Jednakże warto wspomnieć o tym, że ilość danych nie jest wystarczająca do wiarygodnego testowania. Poza tym, wpływ na rezultat działania generatorów ma przede wszystkim główny generator G, w szczególności jego argumenty `a, m, x0`. Widać to doskonale dla powyższego testowania generatora E. Dla `x0 = 1` test został oblany, z kolei dla innego przykładowego `x0` (`= 3`), test został zaliczony pomyślnie.
+
 ## Posłowie <a name="posłowie"></a>
 Projekt został wykonany na potrzeby kursu "Rachunek prawdopodobieństwa i statystyka" na Uniwersytecie Jagiellońskim.
 
 ### Źródła projektowe:
 * Wieczorkowski Robert, "Komputerowe generatory liczb losowych"
 * Ross Sheldon, "A first course in probability"
-* Wałaszek Jerzy, https://eduinf.waw.pl/
+* Wałaszek Jerzy, I Liceum Ogólnokształcące im. K. Brodzińskiego w Tarnowie: https://eduinf.waw.pl/
+* National Institute of Standards and Technology: https://www.itl.nist.gov/div898/handbook/eda/section3/eda35f.htm
