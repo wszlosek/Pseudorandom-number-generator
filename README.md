@@ -256,6 +256,7 @@ Założenie wstępne (w ogólności najważniejsze) dotyczące generatorów inny
 
 Posłużyłem się testami chi-kwadrat. Test chi-kwadrat służy do sprawdzenia, czy próbka danych pochodzi z grona populacji o określonym rozkładzie. W przypadku obliczenia jakości dopasowania chi-kwadrat dane są podzielone na k przedziałów, a statystyka testowa jest zdefiniowana jako:
 > <a href="https://www.codecogs.com/eqnedit.php?latex=\chi^2&space;=&space;\sum_{i=1}^k&space;\frac{(O_i&space;-&space;E_i)^2}{E_i}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\chi^2&space;=&space;\sum_{i=1}^k&space;\frac{(O_i&space;-&space;E_i)^2}{E_i}" title="\chi^2 = \sum_{i=1}^k \frac{(O_i - E_i)^2}{E_i}" /></a>
+
 gdzie `O_i` oznacza obserowaną częstotliwość dla i, z kolei `E_i` oczekiwaną częstotliwość obliczną ze wzoru:
 > <a href="https://www.codecogs.com/eqnedit.php?latex=E_i&space;=&space;N(F(Y_b)&space;-&space;F(Y_a))" target="_blank"><img src="https://latex.codecogs.com/gif.latex?E_i&space;=&space;N(F(Y_b)&space;-&space;F(Y_a))" title="E_i = N(F(Y_b) - F(Y_a))" /></a>
 
