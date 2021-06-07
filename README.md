@@ -272,7 +272,7 @@ Odrzucamy hipotezę, że dane pochodzą z populacji o danym rozkładzie, jeśli:
 gdzie `P` oznacza wartość krytyczną chi-kwadrat dla k-c stopni swobody i pewnym poziomem istotności `a` (w niniejszym programie przyjęto, że `a = 0.05`).
 
 #### Sposób testowania w Pythonie:
-Tworzymy tablicę z przykładowymi danymi o danym rozkładzie, określamy funkcję `cdf` z modułu `scipy.stats` o danym rozkładzie (czyli `scipy.stats.XYZ.cdf(arg)`, przykładowo: `scipy.stats.bernoulli(k, p=0.6)`. 
+Tworzymy tablicę z przykładowymi danymi o danym rozkładzie, określamy funkcję `cdf` z modułu `scipy.stats` o danym rozkładzie (czyli `scipy.stats.XYZ.cdf(arg)`, przykładowo: `scipy.stats.bernoulli(k, p=0.6)`. Jest to nic innego jak *cumulative distribution function* - dystrybuanta. 
 
 Do testowania użyto 10000 danych wejściowych, generator G z argumentami używanymi powyżej. 
 `True` - test zaliczony, `False` - test niezaliczony.
@@ -321,7 +321,7 @@ Do testowania użyto 10000 danych wejściowych, generator G z argumentami używa
 ```
 
 ## Interpretacja wyników <a name="interpretacja-wyników"></a>
-Generalnie można uznać testowanie projektowych generatorów jako pozytywną weryfikację ich wyników. Jednakże warto wspomnieć o tym, że ilość danych nie jest wystarczająca do wiarygodnego testowania. Poza tym, wpływ na rezultat działania generatorów ma przede wszystkim główny generator G, w szczególności jego argumenty `a, m, x0`. Widać to doskonale dla powyższego testowania generatora E. Dla `x0 = 1` test jest nieudany, z kolei dla innego przykładowego `x0 = 3`), test został zaliczony pomyślnie.
+Generalnie można uznać testowanie projektowych generatorów jako pozytywną weryfikację ich wyników. Jednakże warto wspomnieć o tym, że ilość danych nie jest wystarczająca do wiarygodnego testowania. Poza tym, wpływ na rezultat działania generatorów ma przede wszystkim główny generator G, w szczególności jego argumenty `a, m, x0`. Widać to doskonale dla powyższego testowania generatora E. Dla `x0 = 1` test jest nieudany, z kolei dla innego przykładowego `x0 = 3`, test został zaliczony pomyślnie.
 
 ## Posłowie <a name="posłowie"></a>
 Projekt został wykonany na potrzeby kursu "Rachunek prawdopodobieństwa i statystyka" na Uniwersytecie Jagiellońskim.
