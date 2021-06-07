@@ -19,7 +19,7 @@ Zakazane było wykorzystywanie gotowych funkcji lub bibliotek dla generowania li
 Gotowe generatory należało przetestować dowolnymi testami typu: chi-kwadrat, Kołmogorova itp.
 
 ## Opis teoretyczny problemu, rozwiązania matematyczne <a name="opis-teoretyczny-problemu"></a>
-Liczba losowa jest liczbą `r` należącą do pewnego zbioru wartości `{r_1, ..., r_n}` wybieranych z pewnym prawdopodobieństwem. Jeśli jako `r` może pojawić się każda z liczb zbioru z tym samym prawdopodobieństwem `P(r) = 1/n`, to mówimy o równomiernym rozkładzie prawdopodobieństwa liczb losowych z tego zbioru. "Naturalne" liczby losowe wytwarzają się na przykład przy rzucaniu kostką do gry, tasowaniu kart, ciągnieniu losów z urny itp. Generatory takie mają jednak niewielkie zastosowanie praktyczne i mogą być przydatne tylko do losowania niedużych próbek do badań reprezentacyjnych.
+Liczba losowa jest liczbą `r` należącą do pewnego zbioru wartości `{r_1, ..., r_n}` wybieranych z pewnym prawdopodobieństwem. Jeśli jako `r` może pojawić się każda z liczb zbioru z tym samym prawdopodobieństwem `P(r) = 1/n`, to mówimy o równomiernym rozkładzie prawdopodobieństwa liczb losowych z tego zbioru. "Naturalne" liczby losowe wytwarzają się na przykład przy rzucaniu kostką do gry, tasowaniu kart, ciągnieniu losów z urny itp. Generatory takie mają jednak niewielkie zastosowanie praktyczne i mogą być przydatne tylko do losowania niedużych próbek do badań reprezentacyjnych. Powody są oczywiste: ciężko o wygenerowanie wielu wyników rzutu kością czy wytworzenie tysięcy rezultatów w skutek loterii liczbowej.
 
 ###  Liniowy generator kongruencyjny liczb pseudolosowych [ozn. G]:
 W 1951 roku Lehmer zaproponował tzw. liniowy generator kongruencyjny liczb pseudolosowych:
@@ -28,7 +28,7 @@ W 1951 roku Lehmer zaproponował tzw. liniowy generator kongruencyjny liczb pseu
 
 Jeśli `c = 0`, to otrzymujemy tzw. generator multiplikatywny, w przeciwnym przypadku mówimy o generatorze mieszanym. Domyślnie przyjąłem w rozwiązaniu, że generator jest właśnie multiplikatywny.
 
-Taka metoda sprawia, że otrzymujemy pewien ciąg liczbowy, zależny od początkowych wartości liczb `a`, `c` oraz `m`, który możemy nazwać pseudolosowym.
+Taka metoda sprawia, że otrzymujemy pewien ciąg liczbowy, zależny od początkowych wartości liczb `a`, `c` oraz `m`, który możemy nazwać pseudolosowym. Istnieją wartości tych parametrów, które umożliwiają generowanie dużej liczby unikalnych liczb pseudolosowych, zostaną one użyte jako domyślne w implementacji tego generatora.
 
 
 ### Generator liczb pseudolosowych dla rozkładu jednostajnego na przedziale (0, 1) [ozn. U(0, 1)]:
@@ -37,15 +37,19 @@ Liczbę pseudolosową otrzymaną jako rezultat działania takiego generatora, ot
 
 Możemy uogólnić wyszukiwanie takich liczb pseudolosowych dla dowolnego przedziału `(e, f)` [ozn. U(e, f)], poprzez pomnożenie liczby wygenerowanej przez `U(0, 1)` przez `(f - e)`, a następnie dodanie do niej liczby `e`.
 
+Rozkład `U` jest bardzo przydatny do tworzenia innych popularnych rozkładów liczb losowych, niemalże każdy algorytm ich generacji, opiera się na wytworzeniu liczb z `U(0, 1)`, a następnie na operacji na nich. Z tego względu, wyniki wszystkich rozkładów są bardzo zależne od generatora `G`, a więc w szczegolności od jej parametrów.
 
 ### Generator liczb losowych z rozkładu Bernoulliego (z parametrem p) [ozn. B(1, p)] i rozkładu dwumianowego [ozn. Bi(p, n)]:
 
-Generator liczb losowych z rozkładu Bernoulliego zwraca 1 lub 0 (sukces/porażka). Najprostszy algorytm generowania zmiennej losowej o rozkładzie dwumianowym, oparty na jej definicji, zwraca właśnie liczbę sukcesów w n próbach w schemacie Bernoulliego.
+Generator liczb losowych z rozkładu Bernoulliego zwraca 1 lub 0 (sukces/porażka). 
 
+Rozkład dwumianowy to z definicji dyskretny rozkład prawdopodobieństwa opisujący liczbę sukcesów *k* w ciągu *N* niezależnych prób, z których każda ma stałe prawdopodobieństwo sukcesu równe *p*.
 
 ### Generator liczb losowych z rozkładu Poissona [ozn. P(lamb)]:
 
-Zmienna losowa X ma rozkład Poissona P(lamb), jeżeli `(dla x = 0, 1, ...)`:
+Rozkład Poissona to z definicji dyskretny rozkład prawdopodobieństwa, wyrażający prawdopodobieństwo szeregu wydarzeń mających miejsce w określonym czasie, gdy te wydarzenia występują z dną średnią częstotliwością i w sposób niezależny od czasu jaki upłynął od ostatniego zajścia takiego zdarzenia. 
+
+Zmienna losowa X ma rozkład Poissona `P(lamb)`, jeżeli `(dla x = 0, 1, ...)`:
 
 > <a href="https://www.codecogs.com/eqnedit.php?latex=P\{X&space;=&space;x\}&space;=&space;\frac{\lambda^x}{x!}&space;e^{-\lambda}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?P\{X&space;=&space;x\}&space;=&space;\frac{\lambda^x}{x!}&space;e^{-\lambda}" title="P\{X = x\} = \frac{\lambda^x}{x!} e^{-\lambda}" /></a>
 
@@ -252,8 +256,6 @@ Jako że działanie generatorów opiera się na głównym generatorze G, to waż
 ### Testowanie
 Jednym z czynników składających się na całość projektu było testowanie generatorów. 
 
-Założenie wstępne (w ogólności najważniejsze) dotyczące generatorów innych niż G oraz U: wystarczy przetestować jedynie generator U, ponieważ pozostałe rozkłady biorą się (algorytmicznie) właśnie z niego, zatem przetestowany i potwierdzony poprawnościowo generator U będzie świadczył o poprawności generatorów rozkładowych (Poissona, Normalnego i innych).
-
 Posłużyłem się testami chi-kwadrat. Test chi-kwadrat służy do sprawdzenia, czy próbka danych pochodzi z grona populacji o określonym rozkładzie. W przypadku obliczenia jakości dopasowania chi-kwadrat dane są podzielone na k przedziałów, a statystyka testowa jest zdefiniowana jako:
 > <a href="https://www.codecogs.com/eqnedit.php?latex=\chi^2&space;=&space;\sum_{i=1}^k&space;\frac{(O_i&space;-&space;E_i)^2}{E_i}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\chi^2&space;=&space;\sum_{i=1}^k&space;\frac{(O_i&space;-&space;E_i)^2}{E_i}" title="\chi^2 = \sum_{i=1}^k \frac{(O_i - E_i)^2}{E_i}" /></a>
 
@@ -262,7 +264,7 @@ gdzie `O_i` oznacza obserowaną częstotliwość dla i, z kolei `E_i` oczekiwan�
 
 gdzie `F` to dystrybuanta testowanej dystrybucji, Y_b jest górną granicą klasy, Y_a dolną granicą, a N jest wielkością tablicy z danymi (ilością danych). 
 
-Ilość "pojemników" nie jest z góry określona, wiele źródeł podaje optymalną ich ilość jako `2(N^(0.4))` - taka wartość domyślna jest używana podczas testowania projektowego.
+Ilość "pojemników" nie jest z góry określona, wiele źródeł podaje optymalną ich ilość jako `2(N^(0.4))` - taka wartość domyślna jest używana w implementacji tego projektu.
 
 Odrzucamy hipotezę, że dane pochodzą z populacji o danym rozkładzie, jeśli:
 > <a href="https://www.codecogs.com/eqnedit.php?latex=\chi^2&space;>&space;\chi^2_{1-a,&space;k-c}&space;=&space;P" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\chi^2&space;>&space;\chi^2_{1-a,&space;k-c}&space;=&space;P" title="\chi^2 > \chi^2_{1-a, k-c} = P" /></a>
@@ -319,7 +321,7 @@ Do testowania użyto 10000 danych wejściowych, generator G z argumentami używa
 ```
 
 ## Interpretacja wyników <a name="interpretacja-wyników"></a>
-Generalnie można uznać testowanie projektowych generatorów jako pozytywną weryfikację ich wyników. Jednakże warto wspomnieć o tym, że ilość danych nie jest wystarczająca do wiarygodnego testowania. Poza tym, wpływ na rezultat działania generatorów ma przede wszystkim główny generator G, w szczególności jego argumenty `a, m, x0`. Widać to doskonale dla powyższego testowania generatora E. Dla `x0 = 1` test został oblany, z kolei dla innego przykładowego `x0` (`= 3`), test został zaliczony pomyślnie.
+Generalnie można uznać testowanie projektowych generatorów jako pozytywną weryfikację ich wyników. Jednakże warto wspomnieć o tym, że ilość danych nie jest wystarczająca do wiarygodnego testowania. Poza tym, wpływ na rezultat działania generatorów ma przede wszystkim główny generator G, w szczególności jego argumenty `a, m, x0`. Widać to doskonale dla powyższego testowania generatora E. Dla `x0 = 1` test jest nieudany, z kolei dla innego przykładowego `x0 = 3`), test został zaliczony pomyślnie.
 
 ## Posłowie <a name="posłowie"></a>
 Projekt został wykonany na potrzeby kursu "Rachunek prawdopodobieństwa i statystyka" na Uniwersytecie Jagiellońskim.
