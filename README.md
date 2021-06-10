@@ -212,7 +212,6 @@ Poniżej znajdują się algorytmy zapisane w pseudokodzie pythonopodobnym, na kt
     return t
 ```
 
-
 ```python
 [N]:
     
@@ -225,6 +224,34 @@ Poniżej znajdują się algorytmy zapisane w pseudokodzie pythonopodobnym, na kt
             break
     
     return u
+```
+
+```python
+[N]:    # Box-Muller   
+    
+    u1 <- U(0, 1)
+    u2 <- U(0, 1)
+  
+    a <- 2 * pi * u2
+    p <- sqrt(-2 * ln(u1))
+    
+    return (p * cos(a))
+```
+
+```python
+[N]:    # polar method
+    
+    while True:
+        u1 <- E(0, 1)
+        u2 <- U(0, 1)
+        v1 <- 2 * u1 - 1
+        v2 <- 2 * u2 - 1
+        w <- v1 * v1 + v2 * v2
+        
+        if w >= 1:
+            break
+    
+    return (v1 * (-2 * ln(w) / w))
 ```
 
 ## Rezultaty działania programu i eksperymenty <a name="rezultaty-działania-programu"></a>
