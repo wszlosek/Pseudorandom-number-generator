@@ -291,7 +291,7 @@ gdzie `O_i` oznacza obserowaną częstotliwość dla i, z kolei `E_i` oczekiwan�
 
 gdzie `F` to dystrybuanta testowanej dystrybucji, Y_b jest górną granicą klasy, Y_a dolną granicą, a N jest wielkością tablicy z danymi (ilością danych). 
 
-Ilość "pojemników" nie jest z góry określona, wiele źródeł podaje optymalną ich ilość jako `2(N^(0.4))` - taka wartość domyślna jest używana w implementacji tego projektu.
+Ilość "pojemników" nie jest z góry określona, wiele źródeł podaje optymalną ich ilość jako `2(N^(0.4))` - właśnie taka wartość domyślna jest używana w implementacji tego projektu.
 
 Odrzucamy hipotezę, że dane pochodzą z populacji o danym rozkładzie, jeśli:
 > <a href="https://www.codecogs.com/eqnedit.php?latex=\chi^2&space;>&space;\chi^2_{1-a,&space;k-c}&space;=&space;P" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\chi^2&space;>&space;\chi^2_{1-a,&space;k-c}&space;=&space;P" title="\chi^2 > \chi^2_{1-a, k-c} = P" /></a>
@@ -299,6 +299,9 @@ Odrzucamy hipotezę, że dane pochodzą z populacji o danym rozkładzie, jeśli:
 gdzie `P` oznacza wartość krytyczną chi-kwadrat dla k-c stopni swobody i pewnym poziomem istotności `a` (w niniejszym programie przyjęto, że `a = 0.05`).
 
 #### Sposób testowania w Pythonie:
+Funkcja do testowania chi kwadrat przyjmuje jako argumenty: dane do sprawdzenia (wygenerowane przed dany rozkład) oraz dystrybuantę z danego rozkładu, który sprawdzamy.
+
+
 Tworzymy tablicę z przykładowymi danymi o danym rozkładzie, określamy funkcję `cdf` z modułu `scipy.stats` o danym rozkładzie (czyli `scipy.stats.XYZ.cdf(arg)`, przykładowo: `scipy.stats.bernoulli(k, p=0.6)`. Jest to nic innego jak *cumulative distribution function* - dystrybuanta. 
 
 Do testowania użyto 10000 danych wejściowych, generator G z argumentami używanymi powyżej. 
@@ -349,6 +352,9 @@ Do testowania użyto 10000 danych wejściowych, generator G z argumentami używa
 
 ## Interpretacja wyników <a name="interpretacja-wyników"></a>
 Generalnie można uznać testowanie projektowych generatorów jako pozytywną weryfikację ich wyników. Jednakże warto wspomnieć o tym, że ilość danych nie jest wystarczająca do wiarygodnego testowania. Poza tym, wpływ na rezultat działania generatorów ma przede wszystkim główny generator G, w szczególności jego argumenty `a, m, x0`. Widać to doskonale dla powyższego testowania generatora E. Dla `x0 = 1` test jest nieudany, z kolei dla innego przykładowego `x0 = 3`, test został zaliczony pomyślnie.
+Poprawność uzyskanych wyników pokazują również wykresy, których wygląd pokrywa się z prawidłowym zachowaniem "funkcji" utworzonych przez punkty wygenerowane z danego rozkładu.
+
+Reasumując, całość projektu można uznać za zakończoną. Poprawność bierze się również w udowodnionych dawniej lematach, twierdzeniach i spostrzeżeniach, które sprawiają, że można było wykorzystać generator `G` do wytworzenia generatorów innych rozkładów poprawnie.
 
 ## Posłowie <a name="posłowie"></a>
 Projekt został wykonany na potrzeby kursu "Rachunek prawdopodobieństwa i statystyka" na Uniwersytecie Jagiellońskim.
