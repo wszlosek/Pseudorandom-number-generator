@@ -16,7 +16,7 @@ Istotą projektu było stworzenie generatora liczb pseudolosowych o rozkładzie 
 
 Zakazane było wykorzystywanie gotowych funkcji lub bibliotek di generowania liczb losowych. Zakaz obejmował również korzystanie ze źródeł pseudolosowych danych typu zegar systemowy.
 
-Gotowe generatory należało przetestować dowolnym testem typu: chi-kwadrat, Kołmogorova itp.
+Gotowe generatory należało przetestować dowolnym testem typu: chi-kwadrat, Kołmogorova, test serii itp.
 
 ## Opis teoretyczny problemu, rozwiązania matematyczne <a name="opis-teoretyczny-problemu"></a>
 Liczba losowa jest liczbą `r` należącą do pewnego zbioru wartości `{r_1, ..., r_n}` wybieranych z pewnym prawdopodobieństwem. Jeśli jako `r` może pojawić się każda z liczb zbioru z tym samym prawdopodobieństwem `P(r) = 1/n`, to mówimy o równomiernym rozkładzie prawdopodobieństwa liczb losowych z tego zbioru. "Naturalne" liczby losowe wytwarzają się na przykład przy rzucaniu kostką do gry, tasowaniu kart, ciągnieniu losów z urny itp. Generatory takie mają jednak niewielkie zastosowanie praktyczne i mogą być przydatne tylko do losowania niedużych próbek do badań reprezentacyjnych. Powody są oczywiste: ciężko o wygenerowanie wielu wyników rzutu kością czy wytworzenie tysięcy rezultatów w skutek loterii liczbowej.
@@ -283,7 +283,10 @@ Jako że działanie generatorów opiera się na głównym generatorze G, to waż
 ### Testowanie
 Jednym z czynników składających się na całość projektu było testowanie generatorów. 
 
-Posłużyłem się testami chi-kwadrat. Test chi-kwadrat służy do sprawdzenia, czy próbka danych pochodzi z grona populacji o określonym rozkładzie. W przypadku obliczenia jakości dopasowania chi-kwadrat dane są podzielone na k przedziałów, a statystyka testowa jest zdefiniowana jako:
+Do testowania głównego generatora `G` został użyty test serii. Jest to test losowości próby. Stosuje się go m.in. do sprawdzenia, czy wyniki eksperymentu spełniają postulat jej losowości. Opis algorytmu testowania: określamy dane wejściowe oraz ich medianę. Następnie wyliczamy liczbę przejść `k` między kolejnymi liczbami ciągu (w zależności od tego czy są mniejsze czy większe od mediany). Potem należy obliczyć z tego średnią i wariancję, by uzyskać ostatecznie szukaną liczbę `Z`. Przyjmujemy poziom ufności jako 95% (czyli odcinamy po 2.5% z obu stron rozkładu normalnego). Jeśli liczba `Z` się w nim zawiera to orzekamy, że test zakończony jest sukcesem.
+
+
+Ponadto w użyciu jest również test chi-kwadrat. Test chi-kwadrat służy do sprawdzenia, czy próbka danych pochodzi z grona populacji o określonym rozkładzie. W przypadku obliczenia jakości dopasowania chi-kwadrat dane są podzielone na k przedziałów, a statystyka testowa jest zdefiniowana jako:
 > <a href="https://www.codecogs.com/eqnedit.php?latex=\chi^2&space;=&space;\sum_{i=1}^k&space;\frac{(O_i&space;-&space;E_i)^2}{E_i}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\chi^2&space;=&space;\sum_{i=1}^k&space;\frac{(O_i&space;-&space;E_i)^2}{E_i}" title="\chi^2 = \sum_{i=1}^k \frac{(O_i - E_i)^2}{E_i}" /></a>
 
 gdzie `O_i` oznacza obserowaną częstotliwość dla i, z kolei `E_i` oczekiwaną częstotliwość obliczną ze wzoru:
