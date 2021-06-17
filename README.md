@@ -14,7 +14,7 @@
 ## Wstęp - wymagania projektowe <a name="wstęp"></a>
 Istotą projektu było stworzenie generatora liczb pseudolosowych o rozkładzie równomiernym. Na jego podstawie należało stworzyć generator liczb pseudolosowych dla rozkładu jednostajnego na przedziale (0, 1) - a z kolei na jego bazie - generatory liczb losowych z rozkładów: Bernoulliego, dwumianowego, Poissona, wykładniczego, normalnego.
 
-Zakazane było wykorzystywanie gotowych funkcji lub bibliotek di generowania liczb losowych. Zakaz obejmował również korzystanie ze źródeł pseudolosowych danych typu zegar systemowy.
+Zakazane było wykorzystywanie gotowych funkcji lub bibliotek do generowania liczb losowych. Zakaz obejmował również korzystanie ze źródeł pseudolosowych danych typu zegar systemowy.
 
 Gotowe generatory należało przetestować dowolnym testem typu: chi-kwadrat, Kołmogorova, test serii itp.
 
